@@ -1897,9 +1897,9 @@ section.hugetext pre {
 - StationName：站点名称
 - Routes：途经线路
 
-GTFS 数据：
+GeoJson 数据、GTFS 数据：
 
-- 辅助构建线路图，字段详见 GTFS 标准。
+- 辅助构建线路图，字段详见标准文档。
 
 ### 4.2 数据初步预处理：两种方向
 
