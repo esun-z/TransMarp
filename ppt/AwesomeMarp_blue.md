@@ -1874,7 +1874,8 @@ section.hugetext pre {
 
 ## 3. 架构设计
 
-![#c h:500](../assets/Archi.png)
+<img src="https://s2.loli.net/2024/12/17/nc3MZ8RNYT12Si7.png" alt="b8db2e14649ba86f8860c92755138b44" style="zoom:35%;" />
+
 
 ## 4. 数据来源与初步预处理方向
 
