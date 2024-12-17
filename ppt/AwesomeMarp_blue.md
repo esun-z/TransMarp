@@ -2231,6 +2231,97 @@ $$
 
 ## 7.1 线路拥挤度预测
 
+<!-- _class: cols-2-64 -->
+
+<div class=ldiv>
+
+
+|         数据名           | 用到的列 |                   作用                      |
+|        ---------         | ------- |                -----------                 | 
+| `merged_transit_data`    | `month`, `day`, `hour`, `day_of_week`, `line`, `` | 获得`时间`、`线路`、`星期`等信息          |
+| `line_ridership`         | `month`, `day`, `hour`, `day_of_week`, `line`, `segment_ridership`| 获得`时间`、`线路`、`星期`等基本信息，及`每小段人数`                     |
+| `StationDivided`         | `destination_entry`, `destination_exit` | 获取每站的进出人数                           |
+| `transfer`               |  `total_transfer`   | 获得每站的`换乘人数`                         |
+| `subway_lines_start_end` |         | 获取每个站是否是起点或终点                    |
+
+</div>
+
+<div class=rimg>
+
+<!-- ![#c](../images/line_predict_1.png) -->
+![#c](../images/line_predict_1.png)
+</div>
+
+
+## 6.3. 线路拥挤度预测——数据合并
+<!-- _class:  bq-green -->
+> data.py 
+> 
+> 1.加载线路客流数据line_ridership，站点数据StationDivided，换乘数据transfer
+> 2.以line_ridership为基准，和其他表进行左连接
+> 3.计算换乘人数：分别按 Transfer Station Complex ID 和 from_line 分组，和Transfer Station Complex ID 和 to_line 分组，计算换入和换出的人数。再与前面合并好的表进行左连接（时间相等、id相等）。初始化total_transfers为0，加上换入人数，减去换出人数，就是换乘总人数
+
+![#c](../images/line_predict_2.png)
+
+## 6.3. 线路拥挤度预测——数据预处理
+<!-- _class:  bq-blue -->
+> process.py
+> 
+> 1.按小时合并数据。创建time_id列（是year，month，day，hour的合并），time_id相同的合并
+> 2.找到 `destination_station_id` 和 `End Station ID`或`Start Station ID` 匹配的记录，并添加标记列为待删除，在后面统一删除（如果最后一站就是终点站，那么“下一段人数”必为0）
+> 3.使用SQL查询，找到next_segment_ridership：进行自连接，如果t1.destination_station_id = t2.origin_station_id且两条记录的line值相等（再同一地铁线上），且t1.origin_station_id != t2.destination_station_id（非反方向行驶），则认为t1的next_segment_ridership就是t2的segment_ridership
+> 4.数据预处理：进行数据类型转化，把所有的数据转为double，把星期的字符串（"Sunday"）转为int（7）
+
+![#c](../images/line_predict_2.png)
+
+## 6.3. 线路拥挤度预测——设置特征值
+<!-- _class:  bq-purple -->
+> feature.py
+> 
+> 1.对月份、日期、小时、星期进行归一化处理：
+> 2.选定特征列和标签列："segment_ridership", "destination_entry", "destination_exit",  "total_transfers", "hour_sin",  "hour_cos", "month_sin", "month_cos", "day_of_week_sin", "day_of_week_cos"以及"next_segment_ridership"
+> 3.把所有特征值转为数字便于计算
+
+![#c](../images/line_predict_2.png)
+
+## 6.3. 线路拥挤度预测——训练模型
+
+<!-- _class: cols-2-37 -->
+
+<div class=ldiv>
+
+> **predict_forest.py**
+1.分批训练：讲数据分为4批避免内存溢出
+2.使用随机森林算法：numTrees=150,maxDepth=12，next_segment_ridership作为label
+3.使用MAE评价指标。
+4.保存最佳模型
+
+![#c](../images/line_predict_2.png)
+</div>
+
+<div class=rimg>
+
+<!-- ![#c](../images/line_predict_4.png) -->
+![#c](../images/line_predict_4.png)
+</div>
+
+## 6.3 线路拥挤度预测——后端接入
+<div style="display: flex; justify-content: space-between;">
+  <img src="../images/line_predict_5.png" alt="Left Image" width="45%" />
+  <img src="../images/line_predict_6.png" alt="Right Image" width="35%" />
+</div>
+
+## 6.3 线路拥挤度预测——问题与优化
+递归过深，栈溢出
+**→** 改为`左连接`+`spark_sum`
+
+![#c](../images/line_predict_3.png)
+
+
+
+## 6.3 线路拥挤度预测——问题与优化
+**运行时间过长**：每次预测都要调用n次线路预测模型和n次站点人流量预测模型
+**优化方案**：改为输入前面所有站的上车、下车、换乘人数的总和+时间
 
 ---
 
