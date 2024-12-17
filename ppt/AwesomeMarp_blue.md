@@ -5,6 +5,132 @@ theme: am_blue
 paginate: true
 headingDivider: [2,3]
 footer: \ 大数据原理与技术小组作业
+style: |
+    section.pin-3-change1 {
+    overflow: visible;
+    display: grid;
+    gap: 1rem;
+    grid-template-rows: 7% 20% 73%;
+    grid-template-columns: 50% 50%;
+    grid-template-areas:
+        "slideheading slideheading"
+        "toppanel  toppanel"
+        "leftpanel rightpanel";
+    }
+    section.pin-3-change1 h2, section.pin-3-change1 h3 {
+    grid-area: slideheading;
+    font-size: var(--font-size-2-3);
+    }
+    section.pin-3-change1 .tdiv { 
+    grid-area: toppanel; 
+    }
+    section.pin-3-change1 .ldiv { 
+    grid-area: leftpanel; 
+    }
+    section.pin-3-change1 .rdiv { 
+    grid-area: rightpanel; 
+    }
+    section.pin-3-change1 .timg { 
+    grid-area: toppanel; 
+    display: flex;
+    align-items: center;  
+    justify-content: center;
+    }
+    section.pin-3-change1 .limg { 
+    grid-area: leftpanel;
+    display: flex;
+    align-items: center;  
+    justify-content: center;
+    }
+    section.pin-3-change1 .rimg { 
+    grid-area: rightpanel;
+    display: flex;
+    align-items: center;  
+    justify-content: center;
+    }
+
+    section.pin-3-change2 {
+    overflow: visible;
+    display: grid;
+    gap: 1rem;
+    grid-template-rows: 7% 13% 80%;
+    grid-template-columns: 50% 50%;
+    grid-template-areas:
+        "slideheading slideheading"
+        "toppanel  toppanel"
+        "leftpanel rightpanel";
+    }
+    section.pin-3-change2 h2, section.pin-3-change2 h3 {
+    grid-area: slideheading;
+    font-size: var(--font-size-2-3);
+    }
+    section.pin-3-change2 .tdiv { 
+    grid-area: toppanel; 
+    }
+    section.pin-3-change2 .ldiv { 
+    grid-area: leftpanel; 
+    }
+    section.pin-3-change2 .rdiv { 
+    grid-area: rightpanel; 
+    }
+    section.pin-3-change2 .timg { 
+    grid-area: toppanel; 
+    display: flex;
+    align-items: center;  
+    justify-content: center;
+    }
+    section.pin-3-change2 .limg { 
+    grid-area: leftpanel;
+    display: flex;
+    align-items: center;  
+    justify-content: center;
+    }
+    section.pin-3-change2 .rimg { 
+    grid-area: rightpanel;
+    display: flex;
+    align-items: center;  
+    justify-content: center;
+    }
+
+    section.cols-2-change1 {
+    overflow: visible;
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: 60% 40%;
+    grid-template-rows: 10% 90%;
+    grid-template-areas:
+        "slideheading slideheading"
+        "leftpanel    rightpanel";
+    }
+
+    section.cols-2-change1 h2, section.cols-2-change1 h3 {
+    grid-area: slideheading;
+    font-size: var(--font-size-2-3);
+    }
+
+    section.cols-2-change1 .ldiv { 
+    grid-area: leftpanel; 
+    margin-top: -5%;
+    }
+    section.cols-2-change1 .rdiv { 
+    grid-area: rightpanel; 
+    margin-top: -5%;
+    }
+    section.cols-2-change1 .limg { 
+    grid-area: leftpanel; 
+    margin-top: -5%;
+    display: flex;
+    align-items: center;  
+    justify-content: center;
+    }
+    section.cols-2-change1 .rimg { 
+    grid-area: rightpanel; 
+    margin-top: -5%;
+    display: flex;
+    align-items: center;  
+    justify-content: center;
+    }
+
 ---
 
 <style>
@@ -1819,13 +1945,283 @@ GTFS 数据：
 
 在 $树数目 = 10 且深度 = 15$ 时效果较为良好。
 
-## 6. 实现细节：OD 数据统计
+
+## 6. OD数据预处理与统计
 
 <!-- _class: trans -->
-<!-- _footer: "" -->
+<!-- _fooater: "" -->
 <!-- _paginate: "" -->
 
-## 6.1. 数据处理和OD统计
+## 6.1 构建纽约地铁图结构
+
+#### 6.1.1 构建图结构的原因
+
+- **问题**：**希望从现有的OD数据中提取更多信息**，如乘车路径、经过的线路和换乘情况。  
+- **解决方案**：基于现有信息，**构建纽约地铁的图结构**，并**使用最短路径算法估计乘客的乘车路径**。
+
+
+<img src="https://s2.loli.net/2024/12/17/9CueHNDoIUtzV5Y.png" alt="image-20241217083649963" style="zoom:80%;" />
+
+
+
+
+## 6.1.2 已有数据集
+
+<!-- _class: cols-2 -->  
+
+<div class=ldiv>  
+
+- `MTA_Subway_Stations.csv`
+  - 纽约所有**站点的详细信息**，包括其站点名，id，服务的线路集合，经纬度等。
+
+<div style="text-align: center;">
+<img src="https://s2.loli.net/2024/12/16/MDiSoYJEluqKVTU.png" alt="image-20241216224345537" style="zoom:45%;" />
+</div>
+</div>
+
+<div class=rdiv>
+
+- `Subway_Lines.geojson`
+  - 纽约所有**地铁线路的轨迹信息**。
+
+<div style="text-align: center;">
+<img src="https://s2.loli.net/2024/12/16/UuZePrx5ItASjQq.png" alt="image-20241216224115062" style="zoom:50%;" />
+</div>
+</div>
+
+
+## 6.1.3 数据集初步处理
+
+<!-- _class: cols-2 -->  
+
+<div class=ldiv>  
+
+- 美中不足的是，**纽约地铁的轨迹数据集中没有标注站点**。由于轨迹数据集的不完美性，我们也**无法将站点直接标注到轨迹中**。所以我们准备**自行建立纽约地铁图结构**。
+
+- 在检查数据集时，**发现了一条特殊的线路：S线。**
+
+> 纽约地铁的**S线**（Shuttle）是接驳线，方便乘客换乘。共有三条路线：**42街接驳线**（连接时报广场与大中央车站）、**富兰克林大道接驳线**（位于布鲁克林，连接富兰克林大道站与展望公园站）和**洛克威公园接驳线**（位于皇后区，连接宽水道站与洛克威公园-海滩116街站）。
+
+
+</div>
+
+<div class=rdiv>
+
+- 为了方便之后的处理，我们**将其分割为三条线路**。
+
+
+<div style="text-align: center;">
+<img src="https://s2.loli.net/2024/12/17/igfXcQoYWNltCVz.png" alt="image-20241217094040265" style="zoom:70%;" />
+</div>
+
+</div>
+
+
+## 6.1.4 图构建方法
+
+
+
+<!-- _class: pin-3-change1 -->
+
+<div class="tdiv">
+
+- 将每条线路的**站点经纬度标注在图上**，手动标注起终点，并**将其转化为旅行商问题（TSP）**。我们使用谷歌开源的`OR-Tools`求解，**大多数线路可直接得到正确的连线方式，少数形状特殊的线路只需对图结构稍作调整**。
+
+</div>
+
+<div class="ldiv">
+
+- 例如，对于1号线，在图中标注所有点：
+
+<img src="https://s2.loli.net/2024/12/17/Oai5Nv1VShQxUoK.png" alt="subway_line_1_initial_plot" style="zoom:80%;" />
+
+</div>
+
+<div class="rdiv">
+
+
+- 使用`OR-Tools`计算出的路径为：
+
+<img src="https://s2.loli.net/2024/12/17/qC2aBtfhUAH5iWL.png" alt="subway_line_1_optimized_path" style="zoom:80%;" />
+
+</div>
+
+
+## 6.1.4 图构建方法
+
+
+
+<!-- _class: cols-3 -->
+
+
+
+<div class=ldiv>
+
+- 真实的5号线地铁线路图：
+
+<div style="text-align: center;">
+<img src="https://s2.loli.net/2024/12/17/fc1rUkevwpMCNPn.png" alt="image-20241217082228401" style="zoom:60%;" />
+</div>
+</div>
+
+<div class=mdiv>
+
+- 由`OR-Tools`初步处理后：
+
+<div style="text-align: center;">
+
+<img src="https://s2.loli.net/2024/12/17/6S7qzy895PR1Tu3.png" alt="subway_line_5_optimized_path" style="zoom:35%;" />
+</div>
+</div>
+
+
+
+<div class=rdiv>
+
+- 按照真实路线图，手动调整原图的部分边，将图结构调整为真实路线的结构：
+
+<div style="text-align: center;">
+<img src="https://s2.loli.net/2024/11/18/cfCASnbuyrWhH9L.png" alt="Figure_2" style="zoom:80%;" />
+</div>
+</div>
+
+
+## 6.1.4 图构建方法
+
+- 在构建每条地铁线路的图结构后，将其**合并为完整的纽约地铁图结构**。**节点之间的边权重为两站点间的直线距离**，计算方式采用 Haversine 公式。
+
+<img src="https://s2.loli.net/2024/12/17/fM4BEOipXHe3oTh.png" alt="image-20241217081334396" style="zoom:40%;" />
+
+
+
+## 6.2 数据预处理与OD数据的统计分析
+
+<!-- _class: cols-2 -->  
+
+<div class=ldiv>  
+
+
+#### 6.2.1 按换乘拆分OD数据
+
+- 输入：原始的OD数据。
+- 输出：无换乘记录的，按小时聚合的OD数据。
+
+<br>
+
+- 原始的OD数据可能包含换乘，涉及多条线路，难以直接分析，我们可以将**一条有换乘数据拆成多条无换乘的数据**。
+
+</div>
+
+<div class=rimg>
+
+<img src="https://s2.loli.net/2024/12/17/veD6HEA8NayVGQI.png" alt="image-20241217084555949" style="zoom:80%;" />
+
+</div>
+
+## 6.2.1 按换乘拆分OD数据
+
+<!-- _class: cols-2-change1 -->  
+
+<div class=ldiv>  
+
+
+
+**换乘检测算法**
+
+1. **核心思想**：**逆向遍历站点序列，若某站点的可能线路集合为空，则标记为换乘点，并将其可能线路集合重置为当前边的线路集合。**
+
+2. **计算步骤**：  
+   - 初始可能线路集合为最后一段边的线路集合。  
+   - 逆向遍历每个站点 $S[i]$，更新可能线路集合：  
+     $$
+     \text{PossibleLines}[i] = \text{EdgeLines}[i] \cap \text{PossibleLines}[i + 1]
+     $$
+   - 若 $\text{PossibleLines}[i] = \varnothing$，则 $S[i+1]$ 为换乘点，重置：  
+     $$
+     \text{PossibleLines}[i] = \text{EdgeLines}[i]
+     $$
+
+</div>
+
+<div class=rimg>
+
+<img src="https://s2.loli.net/2024/12/17/k2Fv4ZnNd7BetpI.png" alt="image-20241217085222881" style="zoom:70%;" />
+
+</div>
+
+
+
+## 6.2.2 OD数据可视化的实现
+
+**OD矩阵的数据结构**
+
+OD矩阵是一个 $n \times n$ 的矩阵，表示 $n$ 个站点间的客流情况。  
+
+- **行 $i$**：出发站点 $i$ 的客流数据。  
+- **列 $j$**：到达站点 $j$ 的客流数据。  
+- **元素 $OD_{i,j}$**：表示从站点 $i$ 到站点 $j$ 的乘客人数，且 $OD_{i,i} = 0$（不考虑站内流动）。  
+
+矩阵结构如下：  
+$$
+\mathbf{OD} = 
+\begin{bmatrix}
+0          & OD_{1,2} & \cdots & OD_{1,n} \\
+OD_{2,1}   & 0        & \cdots & OD_{2,n} \\
+\vdots     & \vdots   & \ddots & \vdots   \\
+OD_{n,1}   & OD_{n,2} & \cdots & 0
+\end{bmatrix}
+$$
+
+
+## 6.2.2 OD数据可视化的实现
+
+
+1. **数据存储**：每条线路的OD矩阵按每小时、每天的粒度存储在关系型数据库中。
+
+2. **数据查询**：前端可指定线路和时间段，后端汇总该时间段内的OD矩阵并将结果返回前端，前端以密度图的形式进行可视化展示。
+
+
+
+<img src="https://s2.loli.net/2024/12/17/NKOfT9dU6mjvLE3.png" alt="image-20241217115355435" style="zoom:70%;" />
+
+
+
+## 6.2.3 提取地铁"最小段"人流量与站点换乘人数
+
+<!-- _class: pin-3-change2 -->
+
+<div class="tdiv">
+
+
+- 输入：按换乘拆分的OD数据。
+- 输出：每一个"最小段"的地铁线路的人流量与换乘站点的换乘人数。
+
+</div>
+
+<div class="ldiv">
+
+- 根据最短路径算法的结果，判断乘客所走的线路，并将人流量分配至该线路，若有多条可能线路则平分。
+
+
+<div style="text-align: center;">
+<img src="https://s2.loli.net/2024/12/17/aosWmfwg8xDryiF.png" alt="image-20241217090429240" style="zoom:50%;" />
+</div>
+
+
+
+</div>
+
+<div class="rdiv">
+
+- 根据换乘检测算法的结果，判断乘客的换乘方式，并将人流量分配至该换乘方式，若有多种可能方式则平分。
+
+<div style="text-align: center;">
+<img src="https://s2.loli.net/2024/12/17/XNBexQ9468mGH7z.png" alt="image-20241217091028831" style="zoom:50%;" />
+</div>
+
+
+
+</div>
 
 ## 7. 实现细节：线路拥挤度预测
 
